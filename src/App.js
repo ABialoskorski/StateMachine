@@ -4,30 +4,59 @@ import './App.css';
 const randomId = () => Math.floor(Math.random() * 100);
 
 export const App = () => {
-    const [isEmpty, setIsEmpty] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    const [hasLoaded, setHasLoaded] = useState(false);
-    const [hasError, setHasError] = useState(false);
+    const states = {
+        empty: 'empty',
+        isLoading: 'loading',
+        hasLoaded: 'loaded',
+        hasError: 'error',
+    };
+
+    const transitions = {
+        [states.empty]: {
+            FETCH_IMG: states.isLoading
+        },
+        [states.isLoading]: {
+            FETCH_IMG_SUCCESS: states.hasLoaded,
+            FETCH_IMG_ERROR: states.hasError,
+        },
+        [states.hasLoaded]: {
+            FETCH_IMG: states.isLoading
+        },
+        [states.hasError]: {
+            FETCH_IMG: states.isLoading
+        }
+    };
+
+    const transition = (currentState, action) => {
+        const nextState = transitions[currentState][action];
+        return nextState || currentState;
+    };
+    const updateState = (action) => {
+        setCurrentState((currentState) => transition(currentState, action))
+    };
+
+    const compareState = (state) => currentState === state;
+
+    const [currentState, setCurrentState] = useState(states.empty);
     const [imageSrc, setImageSrc] = useState(null);
 
+    // const [isEmpty, setIsEmpty] = useState(true);
+    // const [isLoading, setIsLoading] = useState(false);
+    // const [hasLoaded, setHasLoaded] = useState(false);
+    // const [hasError, setHasError] = useState(false);
+
     const fetchCharacterImage = () => {
-        setIsLoading(false);
-        setIsEmpty(false);
-        setHasError(false);
-        setHasLoaded(false);
+        updateState('FETCH_IMG');
 
         fetch(`https://rickandmortyapi.com/api/character/${randomId()}`)
             .then((res) => res.json())
             .then(({ image }) => {
-                setIsLoading(true);
                 setTimeout(() => {
                     setImageSrc(image);
-                    setIsLoading(false);
-                    setHasLoaded(true);
-                    setIsEmpty(false)
+                    updateState('FETCH_IMG_SUCCESS');
                 }, 700)
             })
-            .catch(() => setHasError(true))
+            .catch(() => updateState('FETCH_IMG_ERROR'))
     };
 
   return (
@@ -35,13 +64,13 @@ export const App = () => {
         <header>
           Rick and Morty Character
         </header>
-        {!hasLoaded && (
-              <div className={`${isEmpty ? 'empty' : ''} ${isLoading ? 'loading' : ''} ${hasError ? 'error' : ''} w-72 h-72`} />
+        {!compareState(states.hasLoaded) && (
+              <div className={`${compareState(states.empty) ? 'empty' : ''} ${compareState(states.isLoading) ? 'loading' : ''} ${compareState(states.hasError) ? 'error' : ''} w-72 h-72`} />
         )}
-        {hasLoaded && <img src={imageSrc} alt="img" />}
+        {compareState(states.hasLoaded) && <img src={imageSrc} alt="img" />}
         <div className="container" />
-        {isEmpty && <p>What you are waiting for? Fetch the first character!</p>}
-        {hasError && <p>An error has occurred. Please try again.</p>}
+        {compareState(states.empty) && <p>What you are waiting for? Fetch the first character!</p>}
+        {compareState(states.hasError) && <p>An error has occurred. Please try again.</p>}
         <div />
         <button onClick={fetchCharacterImage} type="button" className="button">Fetch</button>
       </div>
