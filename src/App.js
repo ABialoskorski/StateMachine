@@ -31,14 +31,12 @@ export const App = () => {
         const nextState = transitions[currentState][action];
         return nextState || currentState;
     };
-    const updateState = (action) => {
-        setCurrentState((currentState) => transition(currentState, action))
-    };
+    const updateState = (action) => setCurrentState((currentState) => transition(currentState, action));
+
     const compareState = (state) => currentState === state;
 
     const [currentState, setCurrentState] = useState(states.empty);
     const [imageSrc, setImageSrc] = useState(null);
-
 
     const fetchCharacterImage = () => {
         updateState('FETCH_IMG');
