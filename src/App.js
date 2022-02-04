@@ -34,16 +34,11 @@ export const App = () => {
     const updateState = (action) => {
         setCurrentState((currentState) => transition(currentState, action))
     };
-
     const compareState = (state) => currentState === state;
 
     const [currentState, setCurrentState] = useState(states.empty);
     const [imageSrc, setImageSrc] = useState(null);
 
-    // const [isEmpty, setIsEmpty] = useState(true);
-    // const [isLoading, setIsLoading] = useState(false);
-    // const [hasLoaded, setHasLoaded] = useState(false);
-    // const [hasError, setHasError] = useState(false);
 
     const fetchCharacterImage = () => {
         updateState('FETCH_IMG');
@@ -76,5 +71,3 @@ export const App = () => {
       </div>
   );
 };
-
-export default App;
