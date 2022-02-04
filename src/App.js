@@ -27,9 +27,7 @@ export const App = () => {
                     setIsEmpty(false)
                 }, 700)
             })
-            .catch(() => {
-                setHasError(true);
-            })
+            .catch(() => setHasError(true))
     };
 
   return (
